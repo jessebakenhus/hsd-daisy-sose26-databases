@@ -1,0 +1,148 @@
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - accepting connections
+Database is ready!
+Use \q to exit
+Example: SELECT * FROM Movies;
+-- ------------------------------------------------------------
+-- Aufgabe 1
+--
+-- Zeigen Sie Titel und Releasedatum aller Filme des Genre „Action“ an. Sortieren Sie nach dem Titel. Hinweis: Nutzen Sie die Tabelle GENRES ( \d GENRES ).
+-- ------------------------------------------------------------
+SELECT title, releasedate FROM movies LEFT JOIN genres ON movies.genre_id = genres.genre_id WHERE genres.name = 'Action';
+          title          | releasedate 
+-------------------------+-------------
+ Fast & Furios 7         | 2016-03-15
+ Fast & Furious 8        | 2017-04-04
+ Iron Man 3              | 2013-04-12
+ Minions                 | 2015-06-11
+ James Bond 007: Skyfall | 2012-11-01
+(5 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 2
+-- Erstellen Sie eine Abfrage, welche Titel, Releasedatum und Genre aller Filme anzeigt. Aktuelle Filme sollen zuerst angezeigt werden.
+-- ------------------------------------------------------------
+SELECT title, releasedate, genres.name FROM movies LEFT JOIN genres ON movies.genre_id = genres.genre_id ORDER BY releasedate DESC;
+                        title                        | releasedate |       name       
+-----------------------------------------------------+-------------+------------------
+ Fast & Furious 8                                    | 2017-04-04  | Action
+ Die Schöne und das Biest                            | 2017-03-17  | Fantasy
+ The First Avenger: Civil War                        | 2016-04-28  | Comic Verfilmung
+ Fast & Furios 7                                     | 2016-03-15  | Action
+ Star Wars: Das Erwachen der Macht                   | 2015-12-14  | Sci-Fi
+ Jurassic World                                      | 2015-12-14  | Sci-Fi
+ Minions                                             | 2015-06-11  | Action
+ Avengers: Age of Ultron                             | 2015-04-13  | Comic Verfilmung
+ Transformers: Ära des Untergangs                    | 2014-07-17  | Comic Verfilmung
+ Iron Man 3                                          | 2013-04-12  | Action
+ James Bond 007: Skyfall                             | 2012-11-01  | Action
+ The Dark Knight Rises                               | 2012-07-26  | Comic Verfilmung
+ The Avengers                                        | 2012-04-11  | Comic Verfilmung
+ Die Eiskönigin – Völlig unverfroren                 | 2011-10-11  | Animation
+ Harry Potter und die Heiligtümer des Todes – Teil 2 | 2011-07-11  | Fantasy
+ Transformers 3 – Die dunkle Seite des Mondes        | 2011-06-29  | Comic Verfilmung
+ Toy Story 3                                         | 2010-07-29  | Animation
+ Avatar - Aufbruch nach Pandora                      | 2009-12-17  | Sci-Fi
+ Der Herr der Ringe: Die Rückkehr des Königs         | 2003-12-17  | Fantasy
+ Titanic                                             | 1997-12-14  | Drama
+(20 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 3
+-- Zeigen Sie Filme an, deren Budget mit einem anderen Film übereinstimmt, der mehr als 600 Millionen Dollar eingespielt hat. Schließen Sie beim Vergleich die Ausgabe deselben Films aus. Sortieren Sie nach Titel.
+-- ------------------------------------------------------------
+SELECT m1.title, m1.budget, m1.profit
+FROM movies m1
+JOIN movies m2 ON m1.budget = m2.budget
+WHERE m2.profit > 600000000
+AND m1.movie_id != m2.movie_id
+ORDER BY m1.title;
+                title                |  budget   |  profit   
+-------------------------------------+-----------+-----------
+ Die Eiskönigin – Völlig unverfroren | 150000000 | 400736600
+ Iron Man 3                          | 200000000 | 408992272
+ James Bond 007: Skyfall             | 200000000 | 304360277
+ Toy Story 3                         | 200000000 | 414984497
+(4 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 5
+-- Erstellen Sie eine Abfrage, welche alle Genres mit der Anzahl der Filme ausgibt.
+-- Hinweis: Es sollen auch Genres ausgegeben werden, denen kein Film zugeordnet wurde.
+-- ------------------------------------------------------------
+SELECT genres.name, COUNT(movies.movie_id) AS Anzahl
+FROM genres
+LEFT JOIN movies ON genres.genre_id = movies.genre_id
+GROUP BY genres.name;
+       name       | anzahl 
+------------------+--------
+ Thriller         |      0
+ Animation        |      2
+ Fantasy          |      3
+ Drama            |      1
+ Sci-Fi           |      3
+ Action           |      5
+ Comic Verfilmung |      6
+(7 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 7
+-- Zeigen Sie ein Mitwirkendenverzeichnis (Vor- und Nachname) aller Filme (Filmtitel) an, einmal mit und einmal ohne das Schlüsselwort "WHERE" zu verwenden. Sortieren Sie die Nachnamen absteigend.
+-- Hinweis: Hierfür werden die Tabellen PERSONS und PERSONSMOVIES benötigt.
+-- ------------------------------------------------------------
+SELECT p.firstname, p.lastname, m.title
+FROM PERSONSMOVIES pm
+    INNER JOIN Persons p ON p.person_id = pm.person_id
+    INNER JOIN Movies m ON m.movie_id = pm.movie_id;
+  firstname  | lastname  |                        title                        
+-------------+-----------+-----------------------------------------------------
+ James       | Cameron   | Avatar - Aufbruch nach Pandora
+ James       | Cameron   | Titanic
+ J. J.       | Abrams    | Star Wars: Das Erwachen der Macht
+ Colin       | Trevorrow | Jurassic World
+ Joss        | Whedon    | The Avengers
+ James       | Wan       | Fast & Furios 7
+ Joss        | Whedon    | Avengers: Age of Ultron
+ David       | Yates     | Harry Potter und die Heiligtümer des Todes – Teil 2
+ Chris       | Buck      | Die Eiskönigin – Völlig unverfroren
+ Jennifer    | Lee       | Die Eiskönigin – Völlig unverfroren
+ Bill        | Condon    | Die Schöne und das Biest
+ F. Gary     | Gray      | Fast & Furious 8
+ Shane       | Black     | Iron Man 3
+ Pierre      | Coffin    | Minions
+ Kyle        | Balda     | Minions
+ Anthony     | Russo     | The First Avenger: Civil War
+ Joe         | Russo     | The First Avenger: Civil War
+ Michael     | Bay       | Transformers 3 – Die dunkle Seite des Mondes
+ Peter       | Jackson   | Der Herr der Ringe: Die Rückkehr des Königs
+ Sam         | Mendes    | James Bond 007: Skyfall
+ Michael     | Bay       | Transformers: Ära des Untergangs
+ Christopher | Nolan     | The Dark Knight Rises
+ Lee         | Unkrich   | Toy Story 3
+(23 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 8
+-- Schreiben Sie eine Abfrage, um den kürzesten Film und den längsten Film anzuzeigen.
+-- Benennen Sie die ausgegebenen Tupel entsprechend. Hinweis: Hier können Sie eine Vereinigung verwenden. Außerdem können in der WHERE-Klausel ein Subselect verwenden.
+-- Benutzen Sie BEZEICHNUNG, RUNTIME und TITLE als Spaltennamen.
+-- Die Ausgabe soll so aussehnen:
+-- ------------------------------------------------------------
+SELECT 'kurz' AS Bezeichnung, runtime, title
+FROM movies
+WHERE runtime = (SELECT MIN(runtime) FROM movies)
+UNION
+SELECT 'lang' AS Bezeichnung, runtime, title
+FROM movies
+WHERE runtime = (SELECT MAX(runtime) FROM movies)
+ORDER BY runtime;
+ bezeichnung | runtime |                    title                    
+-------------+---------+---------------------------------------------
+ kurz        |      91 | Minions
+ lang        |     201 | Der Herr der Ringe: Die Rückkehr des Königs
+(2 rows)
+

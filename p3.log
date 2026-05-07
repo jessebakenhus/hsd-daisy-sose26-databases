@@ -1,0 +1,236 @@
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - accepting connections
+Database is ready!
+Use \q to exit
+Example: SELECT * FROM Movies;
+-- ------------------------------------------------------------
+-- Aufgabe 1
+--
+-- Erstellen Sie eine Abfrage, um alle Daten der Tabelle Movies anzuzeigen. Trennen Sie die Spalten durch ein Komma voneinander. Nennen Sie die Spalte CSV_OUTPUT. Nutzen Sie dafür die String-Verkettung.
+-- ------------------------------------------------------------
+SELECT CONCAT_WS(',',
+    movie_id,
+    title,
+    releasedate,
+    genre_id,
+    budget,
+    openingweek,
+    profit,
+    runtime,
+    certificate,
+    sequelof,
+    distribution
+) AS CSV_OUTPUT
+FROM movies;
+                                                             csv_output                                                             
+------------------------------------------------------------------------------------------------------------------------------------
+ 1,Avatar - Aufbruch nach Pandora,2009-12-17,1,237000000,77025481,760505847,162,12,20th Century Fox
+ 2,Titanic,1997-12-14,2,200000000,28638131,658672302,194,12,Paramount Pictures
+ 3,Star Wars: Das Erwachen der Macht,2015-12-14,1,245000000,247966675,936627416,136,12,Walt Disney Studios
+ 4,Jurassic World,2015-12-14,1,150000000,204600000,652177271,124,12,Universal Studios
+ 5,The Avengers,2012-04-11,3,220000000,207438708,623279547,143,12,Walt Disney Studios
+ 6,Fast & Furios 7,2016-03-15,4,190000000,147187040,350034110,137,12,Universal Studios
+ 7,Avengers: Age of Ultron,2015-04-13,3,250000000,191271109,458991599,141,12,5,Walt Disney Studios
+ 8,Harry Potter und die Heiligtümer des Todes – Teil 2,2011-07-11,5,125000000,169189427,380955619,130,12,Warner Bros. Entertainment
+ 9,Die Eiskönigin – Völlig unverfroren,2011-10-11,6,150000000,67391326,400736600,102,0,Walt Disney Studios
+ 10,Die Schöne und das Biest,2017-03-17,5,160000000,174750616,503974884,129,6,Walt Disney Studios
+ 11,Fast & Furious 8,2017-04-04,4,250000000,98786705,225697400,136,12,6,Universal Studios
+ 12,Iron Man 3,2013-04-12,4,200000000,174144585,408992272,130,12,Walt Disney Studios
+ 13,Minions,2015-06-11,4,74000000,115200000,336029560,91,0,Universal Studios
+ 14,The First Avenger: Civil War,2016-04-28,3,250000000,179139142,408080554,147,12,Walt Disney Studios
+ 15,Transformers 3 – Die dunkle Seite des Mondes,2011-06-29,3,195000000,115886050,352358779,154,12,Paramount Pictures
+ 16,Der Herr der Ringe: Die Rückkehr des Königs,2003-12-17,5,94000000,72629713,377019252,201,12,New Line Cinema
+ 17,James Bond 007: Skyfall,2012-11-01,4,200000000,88364714,304360277,143,12,Metro-Goldwyn-Mayer
+ 18,Transformers: Ära des Untergangs,2014-07-17,3,210000000,100038390,245428137,165,12,15,Paramount Pictures
+ 19,The Dark Knight Rises,2012-07-26,3,250000000,160887295,448130642,164,12,Warner Bros. Entertainment
+ 20,Toy Story 3,2010-07-29,6,200000000,109000000,414984497,103,0,Walt Disney Studios
+(20 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 2a
+-- Zeigen Sie Titel und Genre_ID aller Filme der Genre_IDs 1 und 3 in alphabetischer Reihenfolge nach Titel an.
+-- ------------------------------------------------------------
+SELECT title, genre_id
+FROM movies
+WHERE genre_id IN (1, 3)
+ORDER BY title;
+                    title                     | genre_id 
+----------------------------------------------+----------
+ Avatar - Aufbruch nach Pandora               |        1
+ Avengers: Age of Ultron                      |        3
+ Jurassic World                               |        1
+ Star Wars: Das Erwachen der Macht            |        1
+ The Avengers                                 |        3
+ The Dark Knight Rises                        |        3
+ The First Avenger: Civil War                 |        3
+ Transformers 3 – Die dunkle Seite des Mondes |        3
+ Transformers: Ära des Untergangs             |        3
+(9 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 2b
+-- Modifizieren Sie Ihre Anweisung derart, dass die Anzahl der Filme jeder Genre_ID ausgegeben wird. Benennen Sie die Spalten in GENRE_ID und ANZAHL um.
+-- ------------------------------------------------------------
+SELECT
+    COUNT(movie_id) AS Anzahl,
+    genre_id        AS Genre_ID
+FROM movies
+WHERE genre_id IN (1, 3)
+GROUP BY genre_id;
+ anzahl | genre_id 
+--------+----------
+      3 |        1
+      6 |        3
+(2 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 3a
+--
+-- Schreiben Sie eine Abfrage, um die Anzahl der Filme anzuzeigen. Benennen Sie die Ausgabespalte in ANZAHL um.
+-- ------------------------------------------------------------
+SELECT COUNT(movie_id) AS Anzahl
+FROM movies;
+ anzahl 
+--------
+     20
+(1 row)
+
+-- ------------------------------------------------------------
+-- Aufgabe 3b
+--
+-- Schreiben Sie eine Abfrage um den Gesamtgewinn pro Filmverleih anzugeben. Geben Sie den Betrag in Milliarden Dollar aus.
+-- Die Ausgabe soll wie folgt aussehen:
+--
+-- DISTRIBUTION	MRDDOLLAR
+-- 20th Century Fox	.76
+-- ...	...
+--
+--
+-- Hinweis: Benutzen Sie die Funktion ROUND
+-- ------------------------------------------------------------
+SELECT
+    distribution,
+    SUM(profit) AS MRDDOLLAR
+FROM movies
+GROUP BY distribution;
+        distribution        | mrddollar  
+----------------------------+------------
+ Paramount Pictures         | 1256459218
+ Warner Bros. Entertainment |  829086261
+ New Line Cinema            |  377019252
+ Metro-Goldwyn-Mayer        |  304360277
+ Universal Studios          | 1563938341
+ Walt Disney Studios        | 4155667369
+ 20th Century Fox           |  760505847
+(7 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 4a
+--
+-- Erstellen Sie eine Abfrage um pro Jahr anzuzeigen wie viele Filme in diesem Jahr erschienen sind. Geben Sie für jedes Jahr auch das Gesamteinspielergebnis und das durchschnittlich Einspielergebnis an.
+-- Benennen Sie die Spalten mit JAHR, ANZAHL, GESAMT und DURCHSCHNITT.
+-- Hinweis: Verwenden Sie die Funktion TO_CHAR zur Wandlung eines Datumwertes in eine Zeichenkette.
+-- ------------------------------------------------------------
+SELECT
+    TO_CHAR(releasedate, 'YYYY') AS Jahr,
+    COUNT(movie_id) AS Anzahl,
+    SUM(profit) AS Gesamt,
+    ROUND(AVG(profit), 2) AS Durchschnitt
+FROM movies
+GROUP BY TO_CHAR(releasedate, 'YYYY');
+ jahr | anzahl |   gesamt   | durchschnitt 
+------+--------+------------+--------------
+ 2010 |      1 |  414984497 | 414984497.00
+ 2013 |      1 |  408992272 | 408992272.00
+ 1997 |      1 |  658672302 | 658672302.00
+ 2015 |      4 | 2383825846 | 595956461.50
+ 2012 |      3 | 1375770466 | 458590155.33
+ 2017 |      2 |  729672284 | 364836142.00
+ 2003 |      1 |  377019252 | 377019252.00
+ 2009 |      1 |  760505847 | 760505847.00
+ 2011 |      3 | 1134050998 | 378016999.33
+ 2014 |      1 |  245428137 | 245428137.00
+ 2016 |      2 |  758114664 | 379057332.00
+(11 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 4b
+--
+-- Modifizieren Sie Ihre Abfrage aus 4a in derart, dass nur noch Jahre angezeigt werden in denen mindestens zwei Filme erschienen sind.
+-- ------------------------------------------------------------
+SELECT
+    TO_CHAR(releasedate, 'YYYY') AS Jahr,
+    COUNT(movie_id) AS Anzahl,
+    SUM(profit) AS Gesamt,
+    ROUND(AVG(profit), 2) AS Durchschnitt
+FROM movies
+GROUP BY TO_CHAR(releasedate, 'YYYY')
+HAVING COUNT(movie_id) >= 2;
+ jahr | anzahl |   gesamt   | durchschnitt 
+------+--------+------------+--------------
+ 2015 |      4 | 2383825846 | 595956461.50
+ 2012 |      3 | 1375770466 | 458590155.33
+ 2017 |      2 |  729672284 | 364836142.00
+ 2011 |      3 | 1134050998 | 378016999.33
+ 2016 |      2 |  758114664 | 379057332.00
+(5 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 5
+--
+-- Geben Sie für jeden Anfangsbuchstaben eines Films an, wie viele Filme mit diesem Anfangsbuchstaben gedreht wurden.
+-- ------------------------------------------------------------
+SELECT
+    SUBSTRING(title, 1, 1) AS Anfgngsbuchstabe,
+    COUNT(movie_id) AS Anzahl
+FROM movies
+GROUP BY SUBSTRING(title, 1, 1);
+ anfgngsbuchstabe | anzahl 
+------------------+--------
+ T                |      7
+ J                |      2
+ H                |      1
+ M                |      1
+ I                |      1
+ D                |      3
+ F                |      2
+ S                |      1
+ A                |      2
+(9 rows)
+
+-- ------------------------------------------------------------
+-- Aufgabe 6
+--
+-- Erstellen Sie eine Abfrage, welche in einem Tupel die gesamte Anzahl der Filme anzeigt und wie viele dieser Filme jeweils 2014, 2015, 2016 und 2017 veröffentlicht wurden. Weisen Sie entsprechende Spaltenüberschriften zu. Erklären Sie Ihren Lösungsweg als SQLKommentar in der Log-Datei!
+-- Hinweis: Verwenden Sie die Funktion CASE zur Auswahl der Jahreszahlen.
+-- ------------------------------------------------------------
+SELECT TO_CHAR(releasedate, 'YYYY') AS Jahr,
+SUM(CASE
+    WHEN TO_CHAR(releasedate, 'YYYY') = '2014' THEN 1
+    WHEN TO_CHAR(releasedate, 'YYYY') = '2015' THEN 1
+    WHEN TO_CHAR(releasedate, 'YYYY') = '2016' THEN 1
+    WHEN TO_CHAR(releasedate, 'YYYY') = '2017' THEN 1
+    ELSE 0
+END) AS Anzahl
+FROM movies
+GROUP BY Jahr
+HAVING SUM(CASE
+    WHEN TO_CHAR(releasedate, 'YYYY') = '2014' THEN 1
+    WHEN TO_CHAR(releasedate, 'YYYY') = '2015' THEN 1
+    WHEN TO_CHAR(releasedate, 'YYYY') = '2016' THEN 1
+    WHEN TO_CHAR(releasedate, 'YYYY') = '2017' THEN 1
+    ELSE 0
+END) > 0
+ORDER BY Jahr;
+ jahr | anzahl 
+------+--------
+ 2014 |      1
+ 2015 |      4
+ 2016 |      2
+ 2017 |      2
+(4 rows)
+
