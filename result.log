@@ -1,0 +1,173 @@
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - no response
+localhost:5432 - accepting connections
+Database is ready!
+Use \q to exit
+Example: SELECT * FROM Movies;
+-- Aufgabe 1
+-- Zeigen Sie ein Mitwirkendenverzeichnis (Vor- und Nachname) aller Filme (Filmtitel) mit Tätigkeit an, einmal mit und einmal ohne das Schlüsselwort "WHERE" zu verwenden. Sortieren Sie die Nachnamen absteigend. Hinweis: Hierfür werden die Tabellen PERSONS und PERSONSMOVIES benötigt.
+SELECT p.firstname, p.lastname, m.title, pm.role
+FROM PERSONSMOVIES pm
+    INNER JOIN Persons p ON p.person_id = pm.person_id
+    INNER JOIN Movies m ON m.movie_id = pm.movie_id;
+  firstname  | lastname  |                        title                        |   role    
+-------------+-----------+-----------------------------------------------------+-----------
+ James       | Cameron   | Avatar - Aufbruch nach Pandora                      | direction
+ James       | Cameron   | Titanic                                             | direction
+ J. J.       | Abrams    | Star Wars: Das Erwachen der Macht                   | direction
+ Colin       | Trevorrow | Jurassic World                                      | direction
+ Joss        | Whedon    | The Avengers                                        | direction
+ James       | Wan       | Fast & Furios 7                                     | direction
+ Joss        | Whedon    | Avengers: Age of Ultron                             | direction
+ David       | Yates     | Harry Potter und die Heiligtümer des Todes – Teil 2 | direction
+ Chris       | Buck      | Die Eiskönigin – Völlig unverfroren                 | direction
+ Jennifer    | Lee       | Die Eiskönigin – Völlig unverfroren                 | direction
+ Bill        | Condon    | Die Schöne und das Biest                            | direction
+ F. Gary     | Gray      | Fast & Furious 8                                    | direction
+ Shane       | Black     | Iron Man 3                                          | direction
+ Pierre      | Coffin    | Minions                                             | direction
+ Kyle        | Balda     | Minions                                             | direction
+ Anthony     | Russo     | The First Avenger: Civil War                        | direction
+ Joe         | Russo     | The First Avenger: Civil War                        | direction
+ Michael     | Bay       | Transformers 3 – Die dunkle Seite des Mondes        | direction
+ Peter       | Jackson   | Der Herr der Ringe: Die Rückkehr des Königs         | direction
+ Sam         | Mendes    | James Bond 007: Skyfall                             | direction
+ Michael     | Bay       | Transformers: Ära des Untergangs                    | direction
+ Christopher | Nolan     | The Dark Knight Rises                               | direction
+ Lee         | Unkrich   | Toy Story 3                                         | direction
+(23 rows)
+
+SELECT p.firstname, p.lastname, m.title, pm.role
+FROM PERSONSMOVIES pm, Persons p, Movies m
+WHERE pm.person_id = p.person_id
+  AND pm.movie_id = m.movie_id;
+  firstname  | lastname  |                        title                        |   role    
+-------------+-----------+-----------------------------------------------------+-----------
+ James       | Cameron   | Avatar - Aufbruch nach Pandora                      | direction
+ James       | Cameron   | Titanic                                             | direction
+ J. J.       | Abrams    | Star Wars: Das Erwachen der Macht                   | direction
+ Colin       | Trevorrow | Jurassic World                                      | direction
+ Joss        | Whedon    | The Avengers                                        | direction
+ James       | Wan       | Fast & Furios 7                                     | direction
+ Joss        | Whedon    | Avengers: Age of Ultron                             | direction
+ David       | Yates     | Harry Potter und die Heiligtümer des Todes – Teil 2 | direction
+ Chris       | Buck      | Die Eiskönigin – Völlig unverfroren                 | direction
+ Jennifer    | Lee       | Die Eiskönigin – Völlig unverfroren                 | direction
+ Bill        | Condon    | Die Schöne und das Biest                            | direction
+ F. Gary     | Gray      | Fast & Furious 8                                    | direction
+ Shane       | Black     | Iron Man 3                                          | direction
+ Pierre      | Coffin    | Minions                                             | direction
+ Kyle        | Balda     | Minions                                             | direction
+ Anthony     | Russo     | The First Avenger: Civil War                        | direction
+ Joe         | Russo     | The First Avenger: Civil War                        | direction
+ Michael     | Bay       | Transformers 3 – Die dunkle Seite des Mondes        | direction
+ Peter       | Jackson   | Der Herr der Ringe: Die Rückkehr des Königs         | direction
+ Sam         | Mendes    | James Bond 007: Skyfall                             | direction
+ Michael     | Bay       | Transformers: Ära des Untergangs                    | direction
+ Christopher | Nolan     | The Dark Knight Rises                               | direction
+ Lee         | Unkrich   | Toy Story 3                                         | direction
+(23 rows)
+
+-- Aufgabe 2
+-- Welcher Regisseur hat mit welchem Film das höchste Einspielergebnis in der Eröffnungswoche eingespielt?
+SELECT m.title, p.firstname, p.lastname, (m.profit + m.budget) as einspielergebnis
+FROM PERSONSMOVIES pm
+    INNER JOIN Persons p ON p.person_id = pm.person_id
+    INNER JOIN Movies m ON m.movie_id = pm.movie_id
+WHERE m.movie_id = (SELECT m.movie_id from Movies m ORDER BY (m.profit + m.budget) DESC LIMIT 1);
+               title               | firstname | lastname | einspielergebnis 
+-----------------------------------+-----------+----------+------------------
+ Star Wars: Das Erwachen der Macht | J. J.     | Abrams   |       1181627416
+(1 row)
+
+-- Aufgabe 3
+-- Erstellen Sie eine Abfrage um Filme mit ihrem Genre anzuzeigen, deren Budget genauso hoch ist wie das (irgend-) eines Actionsfilms. Sortieren Sie die Filme alphabetisch. Geben Sie dabei Actionfilme nicht mit aus.
+-- a) verwenden Sie einen(!) Subquery
+SELECT m.movie_id, m.title, m.budget, g.name FROM movies m
+    INNER JOIN genres g ON m.genre_id = g.genre_id
+    WHERE m.genre_id != 4 AND m.budget IN (SELECT m.budget FROM movies m WHERE m.genre_id = 4);
+ movie_id |            title             |  budget   |       name       
+----------+------------------------------+-----------+------------------
+        2 | Titanic                      | 200000000 | Drama
+        7 | Avengers: Age of Ultron      | 250000000 | Comic Verfilmung
+       14 | The First Avenger: Civil War | 250000000 | Comic Verfilmung
+       19 | The Dark Knight Rises        | 250000000 | Comic Verfilmung
+       20 | Toy Story 3                  | 200000000 | Animation
+(5 rows)
+
+-- b) verwenden Sie keinen Subquery
+SELECT DISTINCT m.movie_id, m.title, m.budget, g.name
+FROM movies m
+    INNER JOIN genres g ON m.genre_id = g.genre_id
+    INNER JOIN movies m2 ON m.budget = m2.budget AND m2.genre_id = 4
+WHERE m.genre_id != 4;
+ movie_id |            title             |  budget   |       name       
+----------+------------------------------+-----------+------------------
+        2 | Titanic                      | 200000000 | Drama
+        7 | Avengers: Age of Ultron      | 250000000 | Comic Verfilmung
+       14 | The First Avenger: Civil War | 250000000 | Comic Verfilmung
+       19 | The Dark Knight Rises        | 250000000 | Comic Verfilmung
+       20 | Toy Story 3                  | 200000000 | Animation
+(5 rows)
+
+-- Erstellen Sie eine Abfrage, um die Filme mit ihrem Gewinn anzuzeigen, die mehr Gewinn erzielt haben als jeder Actionfilm. Sortieren Sie das Ergebnis absteigend nach dem Einspielergebnis.
+-- a) mit Subquery, der den maximalen Gewinn eines Actionfilmes ermittelt
+SELECT title, profit
+FROM movies
+WHERE profit > (SELECT MAX(profit) FROM movies WHERE genre_id = 4)
+ORDER BY profit DESC;
+               title               |  profit   
+-----------------------------------+-----------
+ Star Wars: Das Erwachen der Macht | 936627416
+ Avatar - Aufbruch nach Pandora    | 760505847
+ Titanic                           | 658672302
+ Jurassic World                    | 652177271
+ The Avengers                      | 623279547
+ Die Schöne und das Biest          | 503974884
+ Avengers: Age of Ultron           | 458991599
+ The Dark Knight Rises             | 448130642
+ Toy Story 3                       | 414984497
+(9 rows)
+
+-- b) ohne Subquery
+SELECT m.title, m.profit
+FROM movies m
+    INNER JOIN movies a ON a.genre_id = 4
+WHERE m.profit > a.profit
+GROUP BY m.title, m.profit
+HAVING m.profit > MAX(a.profit)
+ORDER BY m.profit DESC;
+                        title                        |  profit   
+-----------------------------------------------------+-----------
+ Star Wars: Das Erwachen der Macht                   | 936627416
+ Avatar - Aufbruch nach Pandora                      | 760505847
+ Titanic                                             | 658672302
+ Jurassic World                                      | 652177271
+ The Avengers                                        | 623279547
+ Die Schöne und das Biest                            | 503974884
+ Avengers: Age of Ultron                             | 458991599
+ The Dark Knight Rises                               | 448130642
+ Toy Story 3                                         | 414984497
+ Iron Man 3                                          | 408992272
+ The First Avenger: Civil War                        | 408080554
+ Die Eiskönigin – Völlig unverfroren                 | 400736600
+ Harry Potter und die Heiligtümer des Todes – Teil 2 | 380955619
+ Der Herr der Ringe: Die Rückkehr des Königs         | 377019252
+ Transformers 3 – Die dunkle Seite des Mondes        | 352358779
+ Fast & Furios 7                                     | 350034110
+ Minions                                             | 336029560
+ James Bond 007: Skyfall                             | 304360277
+ Transformers: Ära des Untergangs                    | 245428137
+(19 rows)
+
+--Aufgabe 5
+-- Geben Sie alle Personen mit Anzahl der Filme aus, die an mehr als einem Film mitgewirkt haben an.
+-- SELECT p.firstname, p.lastname, COUNT(pm.movie_id) AS anzahl_filme
+FROM persons p
+    INNER JOIN personsmovies pm ON p.person_id = pm.person_id
+GROUP BY p.person_id, p.firstname, p.lastname
+HAVING COUNT(pm.movie_id) > 1;
+docker run --rm -v $(pwd)/p5.sql:/p5.sql -e SQL_FILE=/p5.sql bsalgert/postgres:v1 > result.log
