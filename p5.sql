@@ -14,18 +14,18 @@ WHERE pm.person_id = p.person_id
 
 -- Aufgabe 2
 -- Welcher Regisseur hat mit welchem Film das höchste Einspielergebnis in der Eröffnungswoche eingespielt?
-SELECT m.title, p.firstname, p.lastname, (m.profit + m.budget) as einspielergebnis
+SELECT m.title, p.firstname, p.lastname, m.profit
 FROM PERSONSMOVIES pm
     INNER JOIN Persons p ON p.person_id = pm.person_id
     INNER JOIN Movies m ON m.movie_id = pm.movie_id
-WHERE m.movie_id = (SELECT m.movie_id from Movies m ORDER BY (m.profit + m.budget) DESC LIMIT 1);
+WHERE m.profit > (SELECT AVG(m.profit) from Movies m);
 
 -- Aufgabe 3
 -- Erstellen Sie eine Abfrage um Filme mit ihrem Genre anzuzeigen, deren Budget genauso hoch ist wie das (irgend-) eines Actionsfilms. Sortieren Sie die Filme alphabetisch. Geben Sie dabei Actionfilme nicht mit aus.
 -- a) verwenden Sie einen(!) Subquery
 SELECT m.movie_id, m.title, m.budget, g.name FROM movies m
     INNER JOIN genres g ON m.genre_id = g.genre_id
-    WHERE m.genre_id != 4 AND m.budget IN (SELECT m.budget FROM movies m WHERE m.genre_id = 4);
+    WHERE g.name != 'Action' AND m.budget IN (SELECT m.budget FROM movies m JOIN genres g ON m.genre_id = g.genre_id WHERE g.name = 'Action');
 -- b) verwenden Sie keinen Subquery
 SELECT DISTINCT m.movie_id, m.title, m.budget, g.name
 FROM movies m
@@ -33,6 +33,7 @@ FROM movies m
     INNER JOIN movies m2 ON m.budget = m2.budget AND m2.genre_id = 4
 WHERE m.genre_id != 4;
 
+-- Aufg. 4
 -- Erstellen Sie eine Abfrage, um die Filme mit ihrem Gewinn anzuzeigen, die mehr Gewinn erzielt haben als jeder Actionfilm. Sortieren Sie das Ergebnis absteigend nach dem Einspielergebnis.
 -- a) mit Subquery, der den maximalen Gewinn eines Actionfilmes ermittelt
 SELECT title, profit
@@ -55,3 +56,19 @@ FROM persons p
     INNER JOIN personsmovies pm ON p.person_id = pm.person_id
 GROUP BY p.person_id, p.firstname, p.lastname
 HAVING COUNT(pm.movie_id) > 1;
+
+SELECT m.title, g.name, p.firstname, p.lastname
+
+FROM movies m
+
+INNER JOIN genres g
+
+ON m.genre_id = g.genre_id
+
+INNER JOIN personsmovies pm
+
+ON pm.movie_id = m.movie_id
+
+INNER JOIN persons p
+
+ON p.person_id = pm.person_id;
